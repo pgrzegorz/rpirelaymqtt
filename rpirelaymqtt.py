@@ -6,7 +6,7 @@ import logging
 import os
 import signal
 import sys
-
+import RPi.GPIO as GPIO
 
 HOSTNAME = "127.0.0.1"
 DEFAULT_IDENTITY = "heater"
@@ -20,55 +20,56 @@ class RelayBoard():
         self.filename = filename
         self.config = {}
         self.logger = None
+        self.maxlen = 0
         with open(filename, "r") as read_file:
             self.config = json.load(read_file)
+        GPIO.setmode(GPIO.BCM)
+        for name in self.config:
+            GPIO.setup(int(self.config[name]["pin"]), GPIO.OUT)
+            if len(name) > self.maxlen:
+                self.maxlen = len(name)
         self.act()
 
     def set_logger(self, logger):
         self.logger = logger
 
     
-    def process_dependencies(self):
-        circular = False
-        for name in self.config:
-            if name in self.config[name]["depends"]:
-                circular = True
-            for dep in self.config[name]["depends"]:
-                if name in self.config[dep]["depends"]:
-                    circular = True
-        if circular:
-            return False
-        newstates = {}
-        for name in self.config:
-            for dep in self.config[name]["depends"]:
-                if dep:
-                    if not newstates.get(name):
-                        newstates.update({name:0})
-                    newstates[name]+=int(self.config[dep]["state"])
-                
+    def process(self, node, state):
+        """
+        Setup state for one node and dependencies. Break if circular/doubled dependencies.
+        """
+        def visit(todo,path):
+            p =[]
+            p = p + path
+            for i in todo:
+                if i:
+                    if i in p:
+                        if self.logger:
+                            self.logger.warning("Circular or doubled dependency for %s, something may not work as expected"%i)    
+                        return
+                    p.append(i)
+                    self.config[i]["state"]=state
+                    visit(self.config[i]["demands"],p)
+        visit([node],path=[])
 
-        for n in newstates:
-            if n:
-                self.config[n]["state"]=newstates[n]
-        return True
 
-    def setup_state_name(self, name, state):
-        self.config[name]["state"] = state
-
-    def setup_state_mqtt(self, mqtt_topic, state):
+    def get_name_from_mqtt(self, mqtt_topic):
         for name in self.config:
             if self.config[name]["mqtt_topic"]==mqtt_topic:
-                self.config[name]["state"]=state
-    
+                return(name)
+   
     def act(self):
-        if self.process_dependencies():
-            if self.logger:
-                for name in self.config:
-                    state = int(self.config[name]["state"]) and 1 or 0
-                    self.logger.info("%s realy is changing state to %d for pin %s (real state: %s)" % (name,state,self.config[name]["pin"],self.config[name]["state"]))
-        else:
-            if self.logger:
-                self.logger.warning("Circular dependency")
+        """
+        Calculate states for all relays and set I/O states for specified pins.
+        """
+        for name in self.config:
+            if self.config[name]["state"]:
+                self.process(name,1)
+        if self.logger:
+            for name in self.config:
+                state = int(self.config[name]["state"]) and True or False
+                self.logger.info("[ %s ] state %d for pin %02d" % (name.ljust(self.maxlen),state,int(self.config[name]["pin"])))
+                GPIO.output(int(self.config[name]["pin"]), state)
 
 
 def on_connect(client, userdata, flags, rc):
@@ -79,7 +80,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(topic="#",qos=2)
 
 def on_message(client, userdata, msg):
-    userdata.setup_state_mqtt(msg.topic, msg.payload)
+    name = userdata.get_name_from_mqtt(msg.topic)
+    userdata.process(name, int(msg.payload))
     userdata.act()
     
 
