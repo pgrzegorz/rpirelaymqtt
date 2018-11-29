@@ -8,7 +8,7 @@ import sys
 from relayboard import RelayBoard
 
 HOSTNAME = "127.0.0.1"
-DEFAULT_IDENTITY = "heater"
+DEFAULT_IDENTITY = "rpirelaymqtt"
 USERNAME = ""
 PASSWORD = ""
 CONFIG_FILE = ""
