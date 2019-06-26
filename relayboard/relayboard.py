@@ -31,12 +31,12 @@ class RelayBoard():
                 if i:
                     if i in p:
                         if self.logger:
-                            self.logger.warning("Circular or doubled dependency for %s, \
-                                                 something may not work as expected" % i)
+                            self.logger.warning("Circular or doubled dependency for %s, " % i +
+                                                "something may not work as expected")
                         return
                     p.append(i)
                     self.config[i]["state"] = state
-                    visit(self.config[i]["demands"], p)
+                    visit(self.config[i]["depends"], p)
         visit([node], path=[])
 
     def get_name_from_mqtt(self, mqtt_topic):
@@ -51,9 +51,9 @@ class RelayBoard():
         for name in self.config:
             if self.config[name]["state"]:
                 self.process(name, 1)
-        if self.logger:
-            for name in self.config:
-                state = int(self.config[name]["state"]) and True or False
+        for name in self.config:
+            state = int(self.config[name]["state"]) and True or False
+            GPIO.output(int(self.config[name]["pin"]), state)
+            if self.logger:
                 self.logger.info("[ %s ] state %d for pin %02d" %\
-                                 (name.ljust(self.maxlen), state, int(self.config[name]["pin"])))
-                GPIO.output(int(self.config[name]["pin"]), state)
+                    (name.ljust(self.maxlen), state, int(self.config[name]["pin"])))
