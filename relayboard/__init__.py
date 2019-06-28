@@ -1,1 +1,1 @@
-from relayboard import RelayBoard
+from .relayboard import RelayBoard

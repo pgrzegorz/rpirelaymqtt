@@ -25,6 +25,7 @@ class RelayBoard():
         Setup state for one node and dependencies. Break if circular/doubled dependencies.
         """
         def visit(todo, path):
+            ret = True
             p = []
             p = p + path
             for i in todo:
@@ -33,11 +34,12 @@ class RelayBoard():
                         if self.logger:
                             self.logger.warning("Circular or doubled dependency for %s, " % i +
                                                 "something may not work as expected")
-                        return
+                        return False
                     p.append(i)
                     self.config[i]["state"] = state
-                    visit(self.config[i]["depends"], p)
-        visit([node], path=[])
+                    ret = visit(self.config[i]["depends"], p)
+            return ret
+        return visit([node], path=[])
 
     def get_name_from_mqtt(self, mqtt_topic):
         for name in self.config:

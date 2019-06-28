@@ -1,0 +1,22 @@
+{
+  "relay1":  {
+      "mqtt_topic": "/sample/relay1",
+      "pin": 3,
+      "state": 0,
+      "depends": [ "relay2", "relay2" ]
+    },
+
+   "relay2": {
+      "mqtt_topic" : "/sample/mqtt/relay2",
+      "pin": 4, 
+      "state": 0,
+      "depends": [ "relay3" ]
+   },
+
+   "relay3": {
+      "mqtt_topic": "/sample/mqtt/relay3",
+      "pin": 14,
+      "state": 0,
+      "depends": [ ]
+    }
+}
