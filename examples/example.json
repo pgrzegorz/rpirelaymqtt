@@ -2,7 +2,7 @@
   
   "relay1":  {
       "mqtt_topic": "/sample/relay1",
-      "pin": 3,
+      "gpio": 3,
       "state": 0,
       "depends": [    ]
       
@@ -10,34 +10,34 @@
 
    "relay2": {
       "mqtt_topic" : "/sample/mqtt/relay2",
-      "pin": 4, 
+      "gpio": 4, 
       "state": 0,
       "depends": [   ]
    },
 
    "relay3": {
       "mqtt_topic": "/sample/mqtt/relay3",
-      "pin": 14,
+      "gpio": 14,
       "state": 0,
       "depends": [ "relay1", "relay2"   ]
       
     },
   "relay4":  {
       "mqtt_topic": "/sample/mqtt/relay4",
-      "pin": 15,
+      "gpio": 15,
       "state": 0,
       "depends": [ "relay1", "relay2"   ]
       
     },
   "relay5":  {
       "mqtt_topic": "/sample/mqtt/relay5",
-      "pin": 18,
+      "gpio": 18,
       "state": 0,
       "depends": [ "relay1", "relay2" ]
     },
   "relay6":  {
       "mqtt_topic": "/sample/mqtt/relay6",
-      "pin": 2,
+      "gpio": 2,
       "state": 0,
       "depends": [  "relay1", "relay2" ]
       

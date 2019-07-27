@@ -12,7 +12,7 @@ class RelayBoard():
             self.config = json.load(read_file)
         GPIO.setmode(GPIO.BCM)
         for name in self.config:
-            GPIO.setup(int(self.config[name]["pin"]), GPIO.OUT)
+            GPIO.setup(int(self.config[name]["gpio"]), GPIO.OUT)
             if len(name) > self.maxlen:
                 self.maxlen = len(name)
         self.act()
@@ -55,7 +55,8 @@ class RelayBoard():
                 self.process(name, 1)
         for name in self.config:
             state = int(self.config[name]["state"]) and True or False
-            GPIO.output(int(self.config[name]["pin"]), state)
+            state = not state
+            GPIO.output(int(self.config[name]["gpio"]), state)
             if self.logger:
-                self.logger.info("[ %s ] state %d for pin %02d" %\
-                    (name.ljust(self.maxlen), state, int(self.config[name]["pin"])))
+                self.logger.info("[ %s ] state %d for gpio %02d" %\
+                    (name.ljust(self.maxlen), state, int(self.config[name]["gpio"])))
