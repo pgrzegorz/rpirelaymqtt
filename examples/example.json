@@ -1,48 +1,50 @@
 {
   
   "relay1":  {
-      "mqtt_topic": "/sample/relay1",
-      "gpio": 3,
-      "state": 0,
+      "mqtt_command_topic": "home/relays/boiler/switch",
+      "mqtt_status_topic": "home/relays/boiler/status",
+      "gpio": 4,
+      "state": "OFF",
       "depends": [    ]
       
     },
 
    "relay2": {
-      "mqtt_topic" : "/sample/mqtt/relay2",
-      "gpio": 4, 
-      "state": 0,
+      "mqtt_command_topic" : "home/relays/pump/switch",
+      "mqtt_status_topic" : "home/relays/pump/status",
+      "gpio": 17, 
+      "state": "OFF",
       "depends": [   ]
    },
 
    "relay3": {
-      "mqtt_topic": "/sample/mqtt/relay3",
-      "gpio": 14,
-      "state": 0,
+      "mqtt_command_topic": "home/relays/salon/switch",
+      "mqtt_status_topic": "home/relays/salon/status",
+      "gpio": 27,
+      "state": "OFF",
       "depends": [ "relay1", "relay2"   ]
       
     },
   "relay4":  {
-      "mqtt_topic": "/sample/mqtt/relay4",
-      "gpio": 15,
-      "state": 0,
+      "mqtt_command_topic": "home/relays/kitchen/switch",
+      "mqtt_status_topic": "home/relays/kitchen/status",
+      "gpio": 22,
+      "state": "OFF",
       "depends": [ "relay1", "relay2"   ]
       
     },
   "relay5":  {
-      "mqtt_topic": "/sample/mqtt/relay5",
-      "gpio": 18,
-      "state": 0,
+      "mqtt_command_topic": "home/relays/gabinet/switch",
+      "mqtt_status_topic": "home/relays/gabinet/status",
+      "gpio": 23,
+      "state": "OFF",
       "depends": [ "relay1", "relay2" ]
     },
   "relay6":  {
-      "mqtt_topic": "/sample/mqtt/relay6",
-      "gpio": 2,
-      "state": 0,
+      "mqtt_command_topic": "home/relays/bathroom/switch",
+      "mqtt_status_topic": "home/relays/bathroom/status",
+      "gpio": 18,
+      "state": "OFF",
       "depends": [  "relay1", "relay2" ]
-      
-      
     }
- 
-  
 }
