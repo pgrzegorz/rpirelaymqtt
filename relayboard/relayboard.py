@@ -43,20 +43,22 @@ class RelayBoard():
 
     def get_name_from_mqtt(self, mqtt_topic):
         for name in self.config:
-            if self.config[name]["mqtt_topic"] == mqtt_topic:
+            if self.config[name]["mqtt_command_topic"] == mqtt_topic:
                 return(name)
 
     def act(self):
         """
         Calculate states for all relays and set I/O states for specified pins.
         """
+        return_list = []
         for name in self.config:
-            if self.config[name]["state"]:
-                self.process(name, 1)
+            if self.config[name]["state"] == "ON":
+                self.process(name, "ON")
         for name in self.config:
-            state = int(self.config[name]["state"]) and True or False
-            state = not state
+            state = False if self.config[name]["state"] == "ON" else True
+            return_list.append((self.config[name]["mqtt_status_topic"], self.config[name]["state"], 2, False))
             GPIO.output(int(self.config[name]["gpio"]), state)
             if self.logger:
                 self.logger.info("[ %s ] state %d for gpio %02d" %\
                     (name.ljust(self.maxlen), state, int(self.config[name]["gpio"])))
+        return return_list
